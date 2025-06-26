@@ -290,7 +290,7 @@ def search_ids(cql_query, start_record=1, max_records=None, max_records_page=100
         
         all_ids = list(set(all_ids))
         if max_records and len(all_ids) >= max_records:
-            print(f"Reached max_records limit of {max_records}. Stopping search.")
+            print(f"Reached {max_records} limit of {max_records}. Stopping search.")
             break
         
         time.sleep(1)
@@ -506,7 +506,7 @@ def search_ids_v2(place=None, title=None, author=None, publisher=None,
         if max_records and len(all_ids) > max_records:
             all_ids = all_ids[:max_records]
             print(f"Returning first {max_records} records.")
-        return all_ids
+        return all_ids, total
 
     else:
         cql_query = build_cql_query(
@@ -529,7 +529,7 @@ def search_ids_v2(place=None, title=None, author=None, publisher=None,
                                        max_records=max_records,
                                        truncation=truncation)
         print(f"Found {total} total records, fetched {len(record_ids)}")
-        return record_ids
+        return record_ids, total
 
 
 if __name__ == "__main__":
@@ -548,7 +548,7 @@ if __name__ == "__main__":
     )
 
     print("Testing enhanced search with Place='Bern' and max_records=5:")
-    results_bern = search_ids_v2(**filters)
+    results_bern, total = search_ids_v2(**filters)
     # print(f"Results for 'Bern': {results_bern}")
 
     with open('ids.txt', 'w') as f:

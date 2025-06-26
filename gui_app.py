@@ -149,7 +149,7 @@ class EraraImageMatcherGUI:
         buttons_frame = ttk.Frame(scrollable_frame)
         buttons_frame.pack(fill=tk.X, padx=10, pady=20)
         ttk.Button(buttons_frame, text="Search IDs", command=self.search_ids).pack(side=tk.LEFT, padx=5)
-        ttk.Button(buttons_frame, text="Load IDs from File", command=self.load_ids_file).pack(side=tk.LEFT, padx=5)
+        # ttk.Button(buttons_frame, text="Load IDs from File", command=self.load_ids_file).pack(side=tk.LEFT, padx=5)
         ttk.Button(buttons_frame, text="Save Search Config", command=self.save_search_config).pack(side=tk.LEFT, padx=5)
         ttk.Button(buttons_frame, text="Load Search Config", command=self.load_search_config).pack(side=tk.LEFT, padx=5)
         
@@ -398,7 +398,7 @@ class EraraImageMatcherGUI:
         def run_search():
             self.update_search_status("🔍 Searching for IDs...", "blue")
             self.log_message("Starting ID search...")
-            self.progress.start()
+            # self.progress.start()
             
             try:
                 filters = self.get_search_filters()
@@ -409,7 +409,7 @@ class EraraImageMatcherGUI:
                 
                 self.log_message(f"Search parameters: {filters}")
                 
-                results = search_ids_v2(**filters)
+                results, total = search_ids_v2(**filters)
                 if results:
                     # Save to ids.txt
                     ids_file = "ids.txt"
@@ -417,11 +417,11 @@ class EraraImageMatcherGUI:
                         for record_id in results:
                             f.write(f"{record_id}\n")
                     self.ids_file_path.set(os.path.abspath(ids_file))
-                    self.log_message(f"SUCCESS: Found {len(results)} record IDs")
+                    self.log_message(f"SUCCESS: Found {total} record IDs. Returning the first {len(results)}.")
                     self.log_message(f"IDs saved to: {os.path.abspath(ids_file)}")
                     
                     # Update status message with success
-                    self.update_search_status(f"✅ Search complete! Found {len(results)} IDs. Ready for image matching.", "green")
+                    self.update_search_status(f"✅ Search complete! Found {total} IDs. Returning first {len(results)}. Ready for image matching.", "green")
                     
                     # Show first few results
                     preview = results[:10] if len(results) > 10 else results
@@ -436,8 +436,7 @@ class EraraImageMatcherGUI:
                 self.log_message(f"ERROR during search: {str(e)}")
                 self.search_status_var.set(f"❌ Error during search: {str(e)}")
                 self.search_status_label.config(foreground="red")            
-            finally:
-                self.progress.stop()
+           
         
         threading.Thread(target=run_search, daemon=True).start()
         
@@ -538,72 +537,72 @@ class EraraImageMatcherGUI:
         
         threading.Thread(target=run_matching, daemon=True).start()
         
-    def run_complete_pipeline(self):
-        if not self.target_image_path.get():
-            messagebox.showerror("Error", "Please select a target image")
-            return
+    # def run_complete_pipeline(self):
+    #     if not self.target_image_path.get():
+    #         messagebox.showerror("Error", "Please select a target image")
+    #         return
             
-        def run_pipeline():
-            self.log_message("=== STARTING COMPLETE PIPELINE ===")
-            self.progress.start()
+    #     def run_pipeline():
+    #         self.log_message("=== STARTING COMPLETE PIPELINE ===")
+    #         # self.progress.start()
             
-            try:
-                # Step 1: Search for IDs
-                self.log_message("Step 1: Searching for record IDs...")
-                filters = self.get_search_filters()
+    #         try:
+    #             # Step 1: Search for IDs
+    #             self.log_message("Step 1: Searching for record IDs...")
+    #             filters = self.get_search_filters()
                 
-                if not any(filters.values()):
-                    self.log_message("ERROR: Please set at least one search parameter")
-                    return
+    #             if not any(filters.values()):
+    #                 self.log_message("ERROR: Please set at least one search parameter")
+    #                 return
                 
-                record_ids = search_ids_v2(**filters)
+    #             record_ids, total = search_ids_v2(**filters)
                 
-                if not record_ids:
-                    self.log_message("No record IDs found. Pipeline stopped.")
-                    return
+    #             if not record_ids:
+    #                 self.log_message("No record IDs found. Pipeline stopped.")
+    #                 return
                 
-                self.log_message(f"Found {len(record_ids)} record IDs")
+    #             self.log_message(f"Found {total} record IDS. Returning the first {len(record_ids)}.")
                 
-                # Step 2: Run image matching
-                self.log_message("Step 2: Running image matching...")
+    #             # Step 2: Run image matching
+    #             self.log_message("Step 2: Running image matching...")
                 
-                results = batch_download_with_target_filtering(
-                    record_ids=record_ids,
-                    target_image_path=self.target_image_path.get(),
-                    output_dir=self.output_dir.get(),
-                    matcher=self.matcher.get(),
-                    device=self.device.get(),
-                    min_matches=int(self.min_matches.get()),
-                    expand_to_pages=self.expand_to_pages.get(),
-                    max_workers=int(self.max_workers.get()),
-                    preprocessing=self.preprocessing.get()
-                )
+    #             results = batch_download_with_target_filtering(
+    #                 record_ids=record_ids,
+    #                 target_image_path=self.target_image_path.get(),
+    #                 output_dir=self.output_dir.get(),
+    #                 matcher=self.matcher.get(),
+    #                 device=self.device.get(),
+    #                 min_matches=int(self.min_matches.get()),
+    #                 expand_to_pages=self.expand_to_pages.get(),
+    #                 max_workers=int(self.max_workers.get()),
+    #                 preprocessing=self.preprocessing.get()
+    #             )
                 
-                if 'error' in results:
-                    self.log_message(f"ERROR: {results['error']}")
-                    return
+    #             if 'error' in results:
+    #                 self.log_message(f"ERROR: {results['error']}")
+    #                 return
                 
-                # Display final results
-                summary = results['summary']
-                self.log_message("=== PIPELINE COMPLETE ===")
-                self.log_message(f"Input images processed: {summary['input_images']}")
-                self.log_message(f"Candidates found: {summary['candidates_found']}")
-                self.log_message(f"Successfully downloaded: {summary['successfully_downloaded']}")
+    #             # Display final results
+    #             summary = results['summary']
+    #             self.log_message("=== PIPELINE COMPLETE ===")
+    #             self.log_message(f"Input images processed: {summary['input_images']}")
+    #             self.log_message(f"Candidates found: {summary['candidates_found']}")
+    #             self.log_message(f"Successfully downloaded: {summary['successfully_downloaded']}")
                 
-                if summary['successfully_downloaded'] > 0:
-                    self.log_message(f"\nResults saved to: {self.output_dir.get()}")
-                    self.log_message("Best matches:")
-                    for i, file_info in enumerate(results['download']['downloaded_files'][:5]):
-                        self.log_message(f"{i+1}. {file_info['record_id']} ({file_info['good_matches']} matches)")
-                else:
-                    self.log_message("No matching images found.")
+    #             if summary['successfully_downloaded'] > 0:
+    #                 self.log_message(f"\nResults saved to: {self.output_dir.get()}")
+    #                 self.log_message("Best matches:")
+    #                 for i, file_info in enumerate(results['download']['downloaded_files'][:5]):
+    #                     self.log_message(f"{i+1}. {file_info['record_id']} ({file_info['good_matches']} matches)")
+    #             else:
+    #                 self.log_message("No matching images found.")
                 
-            except Exception as e:
-                self.log_message(f"ERROR in pipeline: {str(e)}")
-            finally:
-                self.progress.stop()
+    #         except Exception as e:
+    #             self.log_message(f"ERROR in pipeline: {str(e)}")
+    #         # finally:
+    #         #     self.progress.stop()
         
-        threading.Thread(target=run_pipeline, daemon=True).start()
+    #     threading.Thread(target=run_pipeline, daemon=True).start()
         
     def get_search_filters(self):
         filters = {}
@@ -641,12 +640,12 @@ class EraraImageMatcherGUI:
             self.log_message(f"Error loading IDs file: {str(e)}")
             return []
     
-    def load_ids_file(self):
-        self.browse_ids_file()
-        if self.ids_file_path.get():
-            record_ids = self.load_record_ids()
-            self.log_message(f"Loaded {len(record_ids)} record IDs from file")
-            self.update_matching_status(f"📁 Loaded {len(record_ids)} record IDs from file. Ready to match.", "green")
+    # def load_ids_file(self):
+    #     self.browse_ids_file()
+    #     if self.ids_file_path.get():
+    #         record_ids = self.load_record_ids()
+    #         self.log_message(f"Loaded {len(record_ids)} record IDs from file")
+    #         self.update_matching_status(f"📁 Loaded {len(record_ids)} record IDs from file. Ready to match.", "green")
             
     def save_search_config(self):
         config = {
@@ -741,9 +740,9 @@ class EraraImageMatcherGUI:
         if hasattr(self, 'results_text'):
             self.results_text.delete(1.0, tk.END)
             
-    def stop_pipeline(self):
-        self.progress.stop()
-        self.log_message("Pipeline stopped by user")
+    # def stop_pipeline(self):
+    #     self.progress.stop()
+    #     self.log_message("Pipeline stopped by user")
         
     def open_output_folder(self):
         output_path = self.output_dir.get()
