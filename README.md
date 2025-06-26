@@ -23,8 +23,8 @@ Install with uv (recommended):
 
 ```bash
 # Clone the repository
-git clone https://github.com/BoiMat/Image_matcher.git
-cd Image_matcher
+git clone https://github.com/BoiMat/image_matcher.git
+cd image_matcher
 
 # Basic installation
 uv sync
