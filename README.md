@@ -198,3 +198,32 @@ python e_rara_image_downloader.py ids.txt target_image.jpg --matcher superpoint-
 - **Out of Memory**: Reduce max_workers or switch to CPU
 - **No Matches Found**: Lower min_matches threshold or try different matcher
 - **Slow Processing**: Increase max_workers or use GPU acceleration
+
+# Citations and Acknowledgments
+
+## Image Matching Models
+
+This project uses the image-matching-models repository for deep learning-based image matching algorithms.
+
+**Repository:** https://github.com/alexstoken/image-matching-models
+
+Please cite the EarthMatch paper if you use this tool in your research:
+
+```bibtex
+@InProceedings{Berton_2024_EarthMatch,
+    author    = {Berton, Gabriele and Goletto, Gabriele and Trivigno, Gabriele and Stoken, Alex and Caputo, Barbara and Masone, Carlo},
+    title     = {EarthMatch: Iterative Coregistration for Fine-grained Localization of Astronaut Photography},
+    booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) Workshops},
+    month     = {June},
+    year      = {2024},
+}
+```
+
+## E-Rara Digital Library
+
+This tool accesses historical documents from the e-rara digital library:
+
+**Website:** https://www.e-rara.ch/
+**About:** e-rara is the digital platform for rare books from Swiss institutions
+
+Please acknowledge e-rara when using their content in publications.
