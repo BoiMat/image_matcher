@@ -273,48 +273,6 @@ class EraraImageMatcherGUI:
             self.update_matching_status("Matcher changed to SIFT-NN. Min matches set to 20.", "blue")
         
         self.log_message(f"Matcher changed to {selected_matcher}, min_matches automatically set to {self.min_matches.get()}")
-
-    # def setup_pipeline_tab(self, parent):
-    #     # Title
-    #     title_label = ttk.Label(parent, text="Complete Pipeline: Search → Match", font=("Arial", 14, "bold"))
-    #     title_label.pack(pady=10)
-        
-    #     # Description
-    #     desc_label = ttk.Label(parent, text="This will run the complete pipeline: search for IDs → download and match images", 
-    #                           wrap=800)
-    #     desc_label.pack(pady=5)
-        
-    #     # Quick Setup Frame
-    #     quick_frame = ttk.LabelFrame(parent, text="Quick Setup", padding=10)
-    #     quick_frame.pack(fill=tk.X, padx=10, pady=10)
-        
-    #     ttk.Button(quick_frame, text="Set Example: Bern 1600-1620", 
-    #               command=self.set_bern_example).pack(side=tk.LEFT, padx=5)
-    #     ttk.Button(quick_frame, text="Set Example: Basel with Title", 
-    #               command=self.set_basel_example).pack(side=tk.LEFT, padx=5)
-    #     ttk.Button(quick_frame, text="Clear All", 
-    #               command=self.clear_all_fields).pack(side=tk.LEFT, padx=5)
-        
-    #     # Pipeline Status Frame
-    #     status_frame = ttk.LabelFrame(parent, text="Pipeline Status", padding=10)
-    #     status_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
-        
-    #     self.status_text = scrolledtext.ScrolledText(status_frame, height=15, wrap=tk.WORD)
-    #     self.status_text.pack(fill=tk.BOTH, expand=True)
-        
-    #     # Progress bar
-    #     self.progress = ttk.Progressbar(parent, mode='determinate')
-    #     self.progress.pack(fill=tk.X, padx=10, pady=5)
-        
-    #     # Buttons
-    #     buttons_frame = ttk.Frame(parent)
-    #     buttons_frame.pack(fill=tk.X, padx=10, pady=10)
-        
-    #     ttk.Button(buttons_frame, text="Run Complete Pipeline", 
-    #               command=self.run_complete_pipeline, 
-    #               style="Accent.TButton").pack(side=tk.LEFT, padx=5)
-    #     ttk.Button(buttons_frame, text="Stop", command=self.stop_pipeline).pack(side=tk.LEFT, padx=5)
-    #     ttk.Button(buttons_frame, text="Clear Log", command=self.clear_log).pack(side=tk.LEFT, padx=5)
         
     def setup_results_tab(self, parent):
         # Title
@@ -537,73 +495,6 @@ class EraraImageMatcherGUI:
         
         threading.Thread(target=run_matching, daemon=True).start()
         
-    # def run_complete_pipeline(self):
-    #     if not self.target_image_path.get():
-    #         messagebox.showerror("Error", "Please select a target image")
-    #         return
-            
-    #     def run_pipeline():
-    #         self.log_message("=== STARTING COMPLETE PIPELINE ===")
-    #         # self.progress.start()
-            
-    #         try:
-    #             # Step 1: Search for IDs
-    #             self.log_message("Step 1: Searching for record IDs...")
-    #             filters = self.get_search_filters()
-                
-    #             if not any(filters.values()):
-    #                 self.log_message("ERROR: Please set at least one search parameter")
-    #                 return
-                
-    #             record_ids, total = search_ids_v2(**filters)
-                
-    #             if not record_ids:
-    #                 self.log_message("No record IDs found. Pipeline stopped.")
-    #                 return
-                
-    #             self.log_message(f"Found {total} record IDS. Returning the first {len(record_ids)}.")
-                
-    #             # Step 2: Run image matching
-    #             self.log_message("Step 2: Running image matching...")
-                
-    #             results = batch_download_with_target_filtering(
-    #                 record_ids=record_ids,
-    #                 target_image_path=self.target_image_path.get(),
-    #                 output_dir=self.output_dir.get(),
-    #                 matcher=self.matcher.get(),
-    #                 device=self.device.get(),
-    #                 min_matches=int(self.min_matches.get()),
-    #                 expand_to_pages=self.expand_to_pages.get(),
-    #                 max_workers=int(self.max_workers.get()),
-    #                 preprocessing=self.preprocessing.get()
-    #             )
-                
-    #             if 'error' in results:
-    #                 self.log_message(f"ERROR: {results['error']}")
-    #                 return
-                
-    #             # Display final results
-    #             summary = results['summary']
-    #             self.log_message("=== PIPELINE COMPLETE ===")
-    #             self.log_message(f"Input images processed: {summary['input_images']}")
-    #             self.log_message(f"Candidates found: {summary['candidates_found']}")
-    #             self.log_message(f"Successfully downloaded: {summary['successfully_downloaded']}")
-                
-    #             if summary['successfully_downloaded'] > 0:
-    #                 self.log_message(f"\nResults saved to: {self.output_dir.get()}")
-    #                 self.log_message("Best matches:")
-    #                 for i, file_info in enumerate(results['download']['downloaded_files'][:5]):
-    #                     self.log_message(f"{i+1}. {file_info['record_id']} ({file_info['good_matches']} matches)")
-    #             else:
-    #                 self.log_message("No matching images found.")
-                
-    #         except Exception as e:
-    #             self.log_message(f"ERROR in pipeline: {str(e)}")
-    #         # finally:
-    #         #     self.progress.stop()
-        
-    #     threading.Thread(target=run_pipeline, daemon=True).start()
-        
     def get_search_filters(self):
         filters = {}
         
@@ -639,13 +530,6 @@ class EraraImageMatcherGUI:
         except Exception as e:
             self.log_message(f"Error loading IDs file: {str(e)}")
             return []
-    
-    # def load_ids_file(self):
-    #     self.browse_ids_file()
-    #     if self.ids_file_path.get():
-    #         record_ids = self.load_record_ids()
-    #         self.log_message(f"Loaded {len(record_ids)} record IDs from file")
-    #         self.update_matching_status(f"📁 Loaded {len(record_ids)} record IDs from file. Ready to match.", "green")
             
     def save_search_config(self):
         config = {
